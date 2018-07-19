@@ -25,3 +25,9 @@ variable "istio_version" {
   type        = "string"
   description = "Istio version"
 }
+
+variable "kubernetes_version" {
+  default     = "1.10"
+  type        = "string"
+  description = "Kubernetes version"
+}

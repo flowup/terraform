@@ -27,6 +27,8 @@ resource "google_container_cluster" "primary_cluster" {
     service_account = "${module.service_account.email}"
   }
 
+  min_master_version = "${var.kubernetes_version}"
+
   provisioner "local-exec" {
     command = "${data.template_file.init_startup_script.rendered}"
   }

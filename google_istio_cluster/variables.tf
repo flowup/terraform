@@ -31,3 +31,8 @@ variable "kubernetes_version" {
   type        = "string"
   description = "Kubernetes version"
 }
+
+variable "preemptible_nodes" {
+  default     = false
+  description = "Preemptible nodes in default nodepool"
+}

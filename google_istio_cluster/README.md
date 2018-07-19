@@ -19,5 +19,7 @@ module "cluster" {
   machine_type = "n1-standard-1" # Default
   cluster_size = 3               # Default
   istio_version = "0.8.0"        # Default (Latest)
+  kubernetes_version = "1.9.5"   # Default = "1.10"
+  preemptible_nodes = true       # Default = false
 }
 ```

@@ -25,6 +25,7 @@ resource "google_container_cluster" "primary_cluster" {
   node_config {
     machine_type    = "${var.machine_type}"
     service_account = "${module.service_account.email}"
+    preemptible     = "${var.preemptible_nodes}"
   }
 
   min_master_version = "${var.kubernetes_version}"

@@ -21,7 +21,7 @@ kubectl apply -f $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/hel
 helm init --service-account tiller && sleep 30
 
 IP_RANGES_WHITELIST=$(gcloud container clusters describe ${name} --zone=${zone} | grep -e clusterIpv4Cidr -e servicesIpv4Cidr | awk '{{print $2}}' | sed ':a;N;$!ba;s/\n/\\,/g')
-ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.includeIPRanges=\"$IP_RANGES_WHITELIST\""
+#ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.includeIPRanges=\"$IP_RANGES_WHITELIST\""
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.mtls.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.hub=gcr.io/istio-release --set global.tag=release-1.0-latest-daily"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set grafana.enabled=true"

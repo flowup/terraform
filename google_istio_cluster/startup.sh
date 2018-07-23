@@ -11,8 +11,7 @@ gcloud container clusters get-credentials ${name} --zone ${zone}
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
 
 # Download Istio
-wget https://github.com/istio/istio/releases/download/${istio_version}/istio-${istio_version}-linux.tar.gz
-tar xzf istio-${istio_version}-linux.tar.gz
+git clone -b ${istio_version} https://github.com/istio/istio.git $INSTALL_TMP/istio-${istio_version}
 
 # Install Helm
 wget -P $INSTALL_TMP/helm/ https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
@@ -22,13 +21,15 @@ kubectl apply -f $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/hel
 helm init --service-account tiller && sleep 30
 
 IP_RANGES_WHITELIST=$(gcloud container clusters describe ${name} --zone=${zone} | grep -e clusterIpv4Cidr -e servicesIpv4Cidr | awk '{{print $2}}' | sed ':a;N;$!ba;s/\n/\\,/g')
-ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.resources.requests.cpu=10m --set global.proxy.resources.requests.memory=18Mi"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.includeIPRanges=\"$IP_RANGES_WHITELIST\""
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.mtls.enabled=true"
+ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.hub=gcr.io/istio-release --set global.tag=release-1.0-latest-daily"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set grafana.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set prometheus.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set tracing.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set servicegraph.enabled=true"
+
+echo $ISTIO_OPTIONS
 
 kubectl create ns istio-system
 helm install --name istio --namespace istio-system $ISTIO_OPTIONS $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/istio

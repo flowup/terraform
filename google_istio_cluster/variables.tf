@@ -21,7 +21,7 @@ variable "cluster_size" {
 }
 
 variable "istio_version" {
-  default     = "0.8.0"
+  default     = "1.0.0"
   type        = "string"
   description = "Istio version"
 }

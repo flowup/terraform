@@ -18,8 +18,20 @@ module "cluster" {
   zone = "region"
   machine_type = "n1-standard-1" # Default
   cluster_size = 3               # Default
-  istio_version = "0.8.0"        # Default (Latest)
   kubernetes_version = "1.9.5"   # Default = "1.10"
   preemptible_nodes = true       # Default = false
+
+  oauth_scopes = [
+    "https://www.googleapis.com/auth/compute",
+    "https://www.googleapis.com/auth/devstorage.read_only",
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring"
+  ]
+
+  istio {
+    version = "1.0.0"
+    mtls_enabled = "true"
+    certmanager_enabled = "true"
+  }
 }
 ```

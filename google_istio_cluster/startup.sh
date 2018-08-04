@@ -21,19 +21,18 @@ export PATH="$PATH:$INSTALL_TMP/istio-${istio_version}/bin::$INSTALL_TMP/helm/li
 kubectl apply -f $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/helm-service-account.yaml
 helm init --service-account tiller && sleep 30
 
-# IP_RANGES_WHITELIST=$(gcloud container clusters describe ${name} --zone=${zone} | grep -e clusterIpv4Cidr -e servicesIpv4Cidr | awk '{{print $2}}' | sed ':a;N;$!ba;s/\n/\\,/g')
-# ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.resources.requests.cpu=10m --set global.proxy.resources.requests.memory=18Mi"
-# ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.proxy.includeIPRanges=\"$IP_RANGES_WHITELIST\""
 ISTIO_OPTIONS=" --set global.proxy.image=proxyv2 "
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set sidecar-injector.enabled=true"
-ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.mtls.enabled=true"
+ISTIO_OPTIONS=$ISTIO_OPTIONS" --set global.mtls.enabled=${mtls_enabled}"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set grafana.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set prometheus.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set tracing.enabled=true"
 ISTIO_OPTIONS=$ISTIO_OPTIONS" --set servicegraph.enabled=true"
+ISTIO_OPTIONS=$ISTIO_OPTIONS" --set certmanager.enabled=${certmanager_enabled}"
 
 kubectl create ns istio-system
-helm install --name istio --namespace istio-system $ISTIO_OPTIONS $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/istio
+helm template --name istio --namespace istio-system $ISTIO_OPTIONS $INSTALL_TMP/istio-${istio_version}/install/kubernetes/helm/istio > istio_config.yaml
+kubectl apply -f istio_config.yaml
 kubectl label namespace default istio-injection=enabled
 
 rm -rf $INSTALL_TMP

@@ -1,0 +1,18 @@
+global:
+  mtls:
+    enabled: true
+
+grafana:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+tracing:
+  enabled: true
+
+servicegraph:
+  enabled: true
+
+certmanager:
+  enabled: true

@@ -11,5 +11,5 @@ output "cluster_ca_certificate" {
 }
 
 output "endpoint" {
-    value = "${google_container_cluster.primary_cluster.endpoint}"
+  value = "${google_container_cluster.primary_cluster.endpoint}"
 }

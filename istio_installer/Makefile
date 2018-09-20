@@ -6,17 +6,18 @@ VERSION_HELM=2.10.0
 VERSION_ISTIO=1.0.2
 
 INSTALL_TMP=/tmp/cluster_init
+CONFIG=${PWD}/values.yaml
 
 install: init cluster/auth install/helm install/istio
 
 install/helm:
-	export PATH="$PATH:${INSTALL_TMP}/helm/linux-amd64/"
+	export PATH="${PATH}:${INSTALL_TMP}/helm/linux-amd64/"
 	kubectl apply -f ${INSTALL_TMP}/istio/istio-${VERSION_ISTIO}/install/kubernetes/helm/helm-service-account.yaml
 	helm init --service-account tiller && sleep 30
 
 install/istio:
 	kubectl create ns istio-system
-	helm template -n istio --namespace istio-system -f ${INSTALL_TMP}/istio/istio-${VERSION_ISTIO}/install/kubernetes/helm/istio/values.yaml -f values.yaml ${INSTALL_TMP}/istio/istio-${VERSION_ISTIO}/install/kubernetes/helm/istio > ${INSTALL_TMP}/istio_config.yaml
+	helm template -n istio --namespace istio-system -f ${INSTALL_TMP}/istio/istio-${VERSION_ISTIO}/install/kubernetes/helm/istio/values.yaml -f ${CONFIG} ${INSTALL_TMP}/istio/istio-${VERSION_ISTIO}/install/kubernetes/helm/istio > ${INSTALL_TMP}/istio_config.yaml
 	kubectl apply -f ${INSTALL_TMP}/istio_config.yaml
 	kubectl label namespace default istio-injection=enabled
 

@@ -22,10 +22,12 @@ resource "github_issue_label" "repo" {
     count = "${length(var.feats)}"
     repository = "${var.repo}"
     name = "feat: ${element(var.feats, count.index)}"
+    color = "93c1f9"
 }
 
 resource "github_issue_label" "repo" {
     count = "${length(var.utils)}"
     repository = "${var.repo}"
     name = "util: ${element(var.feats, count.index)}"
+    color = "71dd81"
 }

@@ -12,11 +12,20 @@
 # }
 
 resource "github_issue_label" "repo" {
+    count = "${length(var.general)}"
     repository = "${var.repo}"
-    name = "bug"
-    color = "FF0000"
+    name = "${element(keys(var.general), count.index)}"
+    color = "${lookup(var.general, element(keys(var.general), count.index))}"
 }
 
 resource "github_issue_label" "repo" {
-    
+    count = "${length(var.feats)}"
+    repository = "${var.repo}"
+    name = "feat: ${element(var.feats, count.index)}"
+}
+
+resource "github_issue_label" "repo" {
+    count = "${length(var.utils)}"
+    repository = "${var.repo}"
+    name = "util: ${element(var.feats, count.index)}"
 }

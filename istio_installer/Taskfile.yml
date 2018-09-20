@@ -1,40 +1,53 @@
 version: '2'
 
 vars:
+  
+  # Information about cluster
   CLUSTER_NAME: test
   CLUSTER_ZONE: europe-west1-d
   CLUSTER_USER: 
     sh: gcloud config get-value core/account
 
+  # Versions of tools
   VERSION_HELM: "2.10.0"
   VERSION_ISTIO: "1.0.2"
 
+  # Path to files that are temporarily created
   INSTALL_TMP: /tmp/cluster_init
+
+  # Path to Istio Helm chart's values.yaml that should be used
   CONFIG: "{{.PWD}}/values.yaml"
 
 tasks:
   install:
     vars:
+
+      # Whitelist of cluster's IP ranges so external services can be called directly
       IP_RANGES_WHITELIST:
         sh: gcloud container clusters describe {{.CLUSTER_NAME}} --zone={{.CLUSTER_ZONE}} | grep -e clusterIpv4Cidr -e servicesIpv4Cidr | awk '{{"{{print $2}}"}}' | sed ':a;N;$!ba;s/\n/\\,/g'
 
     cmds:
-    - echo "{{.IP_RANGES_WHITELIST}}"
+    
+    # Download release of Helm and Istio
     - mkdir -p {{.INSTALL_TMP}}
     - wget -P {{.INSTALL_TMP}}/istio/ https://github.com/istio/istio/releases/download/{{.VERSION_ISTIO}}/istio-{{.VERSION_ISTIO}}-linux.tar.gz
     - tar xzf {{.INSTALL_TMP}}/istio/istio-{{.VERSION_ISTIO}}-linux.tar.gz -C {{.INSTALL_TMP}}/istio/
     - wget -P {{.INSTALL_TMP}}/helm/ https://storage.googleapis.com/kubernetes-helm/helm-v{{.VERSION_HELM}}-linux-amd64.tar.gz
     - tar xf {{.INSTALL_TMP}}/helm/helm-v{{.VERSION_HELM}}-linux-amd64.tar.gz -C {{.INSTALL_TMP}}/helm/
 
+    # Authentification to the cluster and adding cluster role for current user
     - gcloud container clusters get-credentials {{.CLUSTER_NAME}} --zone {{.CLUSTER_ZONE}}
     - kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user={{.CLUSTER_USER}}
 
+    # Installation of Helm with created service account
     - kubectl apply -f {{.INSTALL_TMP}}/istio/istio-{{.VERSION_ISTIO}}/install/kubernetes/helm/helm-service-account.yaml
     - "{{.INSTALL_TMP}}/helm/linux-amd64/helm init --service-account tiller && sleep 30"
 
+    # Installation of Istio (cannot be currently installed directly using helm install)
     - kubectl create ns istio-system
     - helm template -n istio --namespace istio-system -f {{.INSTALL_TMP}}/istio/istio-{{.VERSION_ISTIO}}/install/kubernetes/helm/istio/values.yaml -f {{.CONFIG}} --set global.proxy.includeIPRanges="{{.IP_RANGES_WHITELIST}}" {{.INSTALL_TMP}}/istio/istio-{{.VERSION_ISTIO}}/install/kubernetes/helm/istio > {{.INSTALL_TMP}}/istio_config.yaml
     - kubectl apply -f {{.INSTALL_TMP}}/istio_config.yaml
     - kubectl label namespace default istio-injection=enable
-        
+    
+    # Clean up
     - rm -rf {{.INSTALL_TMP}}

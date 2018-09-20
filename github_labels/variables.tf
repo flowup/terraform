@@ -44,3 +44,39 @@ variable "utils" {
     "tests",
   ]
 }
+
+variable "estimates" {
+  type = "list"
+  description = "List of estimations"
+  default = [
+    "1",
+    "2",
+    "3",
+    "5",
+    "8",
+    "13",
+    "21",
+    "40",
+  ]
+}
+
+variable "frequencies" {
+  type = "list"
+  description = "List of frequency labels"
+  default = [
+    "low",
+    "medium",
+    "high",
+  ]
+}
+
+variable "severities" {
+  type = "list"
+  description = "List of severities"
+  default = [
+    "trivial",
+    "minor",
+    "major",
+    "critical",
+  ]
+}

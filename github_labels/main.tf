@@ -39,3 +39,24 @@ resource "github_issue_label" "util_label" {
     name = "util: ${element(var.utils, count.index)}"
     color = "71dd81"
 }
+
+resource "github_issue_label" "estimate_label" {
+    count = "${length(var.estimates)}"
+    repository = "${var.repo}"
+    name = "est: ${element(var.estimates, count.index)}"
+    color = "bfe5bf"
+}
+
+resource "github_issue_label" "severity_label" {
+    count = "${length(var.severities)}"
+    repository = "${var.repo}"
+    name = "severity${count.index}: ${element(var.severities, count.index)}"
+    color = "8e0741"
+}
+
+resource "github_issue_label" "frequency_label" {
+    count = "${length(var.frequencies)}"
+    repository = "${var.repo}"
+    name = "freq${count.index}: ${element(var.frequencies, count.index)}"
+    color = "b6c61f"
+}

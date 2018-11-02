@@ -1,18 +1,36 @@
 global:
   mtls:
-    enabled: true
+    enabled: false
+  proxy:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+  defaultResources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
 
 grafana:
-  enabled: true
+  enabled: false
 
 prometheus:
   enabled: true
 
 tracing:
-  enabled: true
+  enabled: false
 
 servicegraph:
-  enabled: true
+  enabled: false
 
 certmanager:
   enabled: true
+
+kiali:
+  enabled: true
+
+pilot:
+  resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
